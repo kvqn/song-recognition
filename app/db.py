@@ -1,31 +1,47 @@
-import sqlite3
+from app import DATABASE_PATH
+import json
+import uuid
+
+def get_db():
+    try:
+        with open(DATABASE_PATH, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        db =  {
+            "songs": {},
+        }
+        save_db(db)
+        return db
+
+def save_db(db):
+    with open(DATABASE_PATH, "w") as f:
+        json.dump(db, f, indent=4)
+
+def add_song(id, title, song_path, info_path) -> str:
+    """
+    Add a song to the database and return its id as str
+    """
+
+    db = get_db()
+
+    while id in db["songs"]:
+        id = str(uuid.uuid4())
+
+    db["songs"][id] = {
+        "title" : title,
+        "song_path" : song_path,
+        "info_json" : info_path,
+    }
+    save_db(db)
+
+    return id
 
 
-class Database:
-    def __init__(self, database: str):
-        self._conn = sqlite3.connect(database)
-        self._cursor = self._conn.cursor()
-        self._cursor.execute(
-            """create table if not exists songs
-            (id integer primary key autoincrement,
-             title text not null,
-             artist text,
-             duration integer,
-             path text not null,
-             lyrics_path text not null,
-             album_art_path text
-             )"""
-        )
+def list_songs():
+    """
+    List all the songs in the database
+    """
 
-    def list_songs(self):
-        """List all the available songs"""
-        self._cursor.execute("SELECT * FROM songs")
-        return self._cursor.fetchall()
+    db = get_db()
+    return db["songs"]
 
-    def add_song(self, title, artist, duration, path, lyrics_path, album_art_path):
-        """Add a song to the database"""
-        self._cursor.execute(
-            "INSERT INTO songs (title, artist, duration, path, lyrics_path, album_art_path) VALUES (?, ?, ?, ?, ?, ?)",
-            (title, artist, duration, path, lyrics_path, album_art_path),
-        )
-        self._conn.commit()

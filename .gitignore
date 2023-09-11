@@ -2,3 +2,7 @@
 **/__pycache__/**
 
 db.sqlite3
+testing
+dataset
+cache
+db.json

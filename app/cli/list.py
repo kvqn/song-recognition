@@ -1,14 +1,17 @@
 
 
 from app import DATABASE_PATH
-from app.db import Database
+from app.db import list_songs
 
 
 def list_main(args):
-    print("List all the available songs")
+    songs = list_songs()
 
-    db = Database(DATABASE_PATH)
-    print(db.list_songs())
+    print(f"Currently storing {len(songs)} songs.")
+
+    for id, song in songs.items():
+        print(f"{id} - {song['title']}")
+
 
 
 
