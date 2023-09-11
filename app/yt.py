@@ -1,4 +1,5 @@
 import subprocess
+
 from . import YTDLP_PATH
 import uuid
 import json
@@ -47,4 +48,32 @@ class InfoJson:
 
     def get_title(self):
         return self.info["title"]
+
+class PlaylistSong:
+    def __init__(self, title, url, duration):
+        self.title = title
+        self.url = url
+        self.duration = duration
+
+def get_songs_in_playlist(url):
+
+    proc = subprocess.run([YTDLP_PATH, "--flat-playlist", "--dump-single-json", url], capture_output=True)
+    if proc.returncode != 0:
+        raise Exception("Failed to get playlist")
+
+    playlist = json.loads(proc.stdout)
+
+    songs = []
+    bad = 0
+    for song in playlist["entries"]:
+        title = song["title"]
+        url = song["url"]
+        duration = song["duration"]
+        if not title or not url or not duration:
+            bad += 1
+            continue
+        songs.append(PlaylistSong(title, url, duration))
+
+    print(f"{bad} bad songs")
+    return songs
 

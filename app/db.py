@@ -17,7 +17,7 @@ def save_db(db):
     with open(DATABASE_PATH, "w") as f:
         json.dump(db, f, indent=4)
 
-def add_song(id, title, song_path, info_path) -> str:
+def add_song_to_db(id, title, song_path, info_path) -> str:
     """
     Add a song to the database and return its id as str
     """
