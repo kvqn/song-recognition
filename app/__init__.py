@@ -17,6 +17,13 @@ if not os.path.exists(CACHE_DIR_PATH):
 
 YTDLP_PATH = os.getenv("YTDLP_PATH", "yt-dlp")
 
-def check_youtube_dl_exist():
-    return subprocess.run([YTDLP_PATH, '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
 
+def check_youtube_dl_exist():
+    return (
+        subprocess.run(
+            [YTDLP_PATH, "--version"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        ).returncode
+        == 0
+    )

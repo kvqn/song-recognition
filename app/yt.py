@@ -7,6 +7,7 @@ from app import CACHE_DIR_PATH
 import os
 import azapi
 
+
 class DownloadedSong:
     def __init__(self, id, title, artist, song_path, info_json_path, lyrics_path):
         self.id = id
@@ -28,7 +29,18 @@ def download_song(url) -> DownloadedSong | None:
 
     print("Downloading song...")
 
-    proc = subprocess.run([YTDLP_PATH, "--progress", "-xq", "-o", os.path.join(cache_dir, "%(title)s.%(ext)s"), "--restrict-filenames", "--write-info-json", url])
+    proc = subprocess.run(
+        [
+            YTDLP_PATH,
+            "--progress",
+            "-xq",
+            "-o",
+            os.path.join(cache_dir, "%(title)s.%(ext)s"),
+            "--restrict-filenames",
+            "--write-info-json",
+            url,
+        ]
+    )
     if proc.returncode != 0:
         return None
 
@@ -48,14 +60,14 @@ def download_song(url) -> DownloadedSong | None:
 
     print("Downloading lyrics...")
 
-    az = azapi.AZlyrics('google', accuracy=0.5)
+    az = azapi.AZlyrics("google", accuracy=0.5)
     az.title = title
     az.getLyrics()
     title = az.title
     artist = az.artist
 
-    lyrics_path = os.path.join(cache_dir, 'lyrics.txt')
-    with open(lyrics_path, 'w') as f:
+    lyrics_path = os.path.join(cache_dir, "lyrics.txt")
+    with open(lyrics_path, "w") as f:
         f.write(az.lyrics)
 
     return DownloadedSong(id, title, artist, song_path, info_json_path, lyrics_path)
@@ -70,15 +82,18 @@ class InfoJson:
     def get_title(self):
         return self.info["title"]
 
+
 class PlaylistSong:
     def __init__(self, title, url, duration):
         self.title = title
         self.url = url
         self.duration = duration
 
-def get_songs_in_playlist(url):
 
-    proc = subprocess.run([YTDLP_PATH, "--flat-playlist", "--dump-single-json", url], capture_output=True)
+def get_songs_in_playlist(url):
+    proc = subprocess.run(
+        [YTDLP_PATH, "--flat-playlist", "--dump-single-json", url], capture_output=True
+    )
     if proc.returncode != 0:
         raise Exception("Failed to get playlist")
 
@@ -97,4 +112,3 @@ def get_songs_in_playlist(url):
 
     print(f"{bad} bad songs")
     return songs
-

@@ -6,7 +6,6 @@ from app.yt import get_songs_in_playlist
 
 
 def add_playlist_main(args):
-
     url = args.url
     songs = get_songs_in_playlist(url)
 
@@ -26,7 +25,3 @@ def add_playlist_main(args):
         add_song(song.url, i + 1, len(songs))
 
     print("Done")
-
-
-
-

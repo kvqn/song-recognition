@@ -2,7 +2,10 @@ import subprocess
 
 
 def move_file(src, dst):
-    subprocess.run(['mv', src, dst], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(
+        ["mv", src, dst], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+
 
 def strfdelta(tdelta):
     "Convert timedelta to string"
@@ -10,6 +13,7 @@ def strfdelta(tdelta):
     d["hours"], rem = divmod(tdelta.seconds, 3600)
     d["minutes"], d["seconds"] = divmod(rem, 60)
     return "{hours}:{minutes:02d}:{seconds:02d}".format(**d)
+
 
 def ask_question(question) -> bool:
     resp = input(question)

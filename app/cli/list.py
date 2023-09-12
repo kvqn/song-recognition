@@ -1,5 +1,3 @@
-
-
 from app import DATABASE_PATH
 from app.db import list_songs
 
@@ -11,7 +9,3 @@ def list_main(args):
 
     for id, song in songs.items():
         print(f"{id} - {song['title']}")
-
-
-
-
