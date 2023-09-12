@@ -5,12 +5,16 @@ import uuid
 import json
 from app import CACHE_DIR_PATH
 import os
+import azapi
 
 class DownloadedSong:
-    def __init__(self, id, song_path, info_json_path):
+    def __init__(self, id, title, artist, song_path, info_json_path, lyrics_path):
         self.id = id
+        self.title = title
+        self.artist = artist
         self.song_path = song_path
         self.info_json_path = info_json_path
+        self.lyrics_path = lyrics_path
 
 
 def download_song(url) -> DownloadedSong | None:
@@ -21,6 +25,8 @@ def download_song(url) -> DownloadedSong | None:
     id = str(uuid.uuid4())
     cache_dir = os.path.join(CACHE_DIR_PATH, id)
     os.mkdir(cache_dir)
+
+    print("Downloading song...")
 
     proc = subprocess.run([YTDLP_PATH, "--progress", "-xq", "-o", os.path.join(cache_dir, "%(title)s.%(ext)s"), "--restrict-filenames", "--write-info-json", url])
     if proc.returncode != 0:
@@ -37,7 +43,22 @@ def download_song(url) -> DownloadedSong | None:
     if info_json_path is None or song_path is None:
         return None
 
-    return DownloadedSong(id, song_path, info_json_path)
+    info = InfoJson(info_json_path)
+    title = info.get_title()
+
+    print("Downloading lyrics...")
+
+    az = azapi.AZlyrics('google', accuracy=0.5)
+    az.title = title
+    az.getLyrics()
+    title = az.title
+    artist = az.artist
+
+    lyrics_path = os.path.join(cache_dir, 'lyrics.txt')
+    with open(lyrics_path, 'w') as f:
+        f.write(az.lyrics)
+
+    return DownloadedSong(id, title, artist, song_path, info_json_path, lyrics_path)
 
 
 class InfoJson:
