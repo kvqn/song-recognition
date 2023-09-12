@@ -1,8 +1,7 @@
 import datetime
-from app.cli.add_song import add_song
 from app.util import strfdelta, ask_question
-
 from app.yt import get_songs_in_playlist
+from app.threads import ThreadManager
 
 
 def add_playlist_main(args):
@@ -21,7 +20,9 @@ def add_playlist_main(args):
         print("Aborting")
         return
 
-    for i, song in enumerate(songs):
-        add_song(song.url, i + 1, len(songs))
+    manager = ThreadManager(songs, 4)
+    manager.start_download()
 
     print("Done")
+
+

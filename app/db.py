@@ -1,9 +1,13 @@
 from app import DATABASE_PATH
 import json
 import uuid
+import threading
 
+
+DB_LOCK = threading.Lock()
 
 def get_db():
+    DB_LOCK.acquire()
     try:
         with open(DATABASE_PATH, "r") as f:
             return json.load(f)
@@ -18,6 +22,7 @@ def get_db():
 def save_db(db):
     with open(DATABASE_PATH, "w") as f:
         json.dump(db, f, indent=4)
+    DB_LOCK.release()
 
 
 def add_song_to_db(id, title, artist, song_path, info_path, lyrics_path) -> str:

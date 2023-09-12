@@ -18,7 +18,7 @@ class DownloadedSong:
         self.lyrics_path = lyrics_path
 
 
-def download_song(url) -> DownloadedSong | None:
+def download_song(url, output_func = print) -> DownloadedSong | None:
     """
     Download a song from YouTube
     """
@@ -27,12 +27,12 @@ def download_song(url) -> DownloadedSong | None:
     cache_dir = os.path.join(CACHE_DIR_PATH, id)
     os.mkdir(cache_dir)
 
-    print("Downloading song...")
+    output_func("Downloading song...")
 
     proc = subprocess.run(
         [
             YTDLP_PATH,
-            "--progress",
+            # "--progress",
             "-xq",
             "-o",
             os.path.join(cache_dir, "%(title)s.%(ext)s"),
@@ -58,7 +58,7 @@ def download_song(url) -> DownloadedSong | None:
     info = InfoJson(info_json_path)
     title = info.get_title()
 
-    print("Downloading lyrics...")
+    output_func("Downloading lyrics...")
 
     az = azapi.AZlyrics("google", accuracy=0.5)
     az.title = title
@@ -84,10 +84,11 @@ class InfoJson:
 
 
 class PlaylistSong:
-    def __init__(self, title, url, duration):
+    def __init__(self, title, url, duration, index):
         self.title = title
         self.url = url
         self.duration = duration
+        self.index = index
 
 
 def get_songs_in_playlist(url):
@@ -101,6 +102,7 @@ def get_songs_in_playlist(url):
 
     songs = []
     bad = 0
+    prev_index = 0
     for song in playlist["entries"]:
         title = song["title"]
         url = song["url"]
@@ -108,7 +110,8 @@ def get_songs_in_playlist(url):
         if not title or not url or not duration:
             bad += 1
             continue
-        songs.append(PlaylistSong(title, url, duration))
+        prev_index += 1
+        songs.append(PlaylistSong(title, url, duration, prev_index))
 
     print(f"{bad} bad songs")
     return songs
