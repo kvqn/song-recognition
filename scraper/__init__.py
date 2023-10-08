@@ -2,12 +2,11 @@ import os
 from dotenv import load_dotenv
 import subprocess
 
-
 load_dotenv()
 
-DATABASE_PATH = "db.json"
 CACHE_DIR_PATH = "cache"
 DATASET_DIR_PATH = "dataset"
+DATABASE_PATH = os.path.join(DATASET_DIR_PATH, "db.json")
 
 if not os.path.exists(DATASET_DIR_PATH):
     os.mkdir(DATASET_DIR_PATH)
