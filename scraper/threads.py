@@ -1,7 +1,7 @@
-from app import CACHE_DIR_PATH, DATASET_DIR_PATH
-from app.util import move_file
-from app.yt import PlaylistSong, download_song
-from app.db import add_song_to_db
+from scraper import CACHE_DIR_PATH, DATASET_DIR_PATH
+from scraper.util import move_file
+from scraper.yt import PlaylistSong, download_song
+from scraper.db import add_song_to_db
 import os
 import threading
 from blessings import Terminal

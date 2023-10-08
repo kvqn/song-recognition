@@ -1,6 +1,7 @@
 azapi==3.0.8
 beautifulsoup4==4.12.2
 black==23.9.1
+blessings==1.7
 Brotli==1.1.0
 bs4==0.0.1
 certifi==2023.7.22
@@ -15,6 +16,7 @@ platformdirs==3.10.0
 pycryptodomex==3.18.0
 python-dotenv==1.0.0
 requests==2.31.0
+six==1.16.0
 soupsieve==2.5
 urllib3==2.0.4
 websockets==11.0.3

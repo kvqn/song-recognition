@@ -1,5 +1,5 @@
-from app.threads import ThreadManager
-from app.yt import PlaylistSong
+from scraper.threads import ThreadManager
+from scraper.yt import PlaylistSong
 
 def add_song_main(args):
     url = args.url

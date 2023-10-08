@@ -3,7 +3,7 @@ import subprocess
 from . import YTDLP_PATH
 import uuid
 import json
-from app import CACHE_DIR_PATH
+from scraper import CACHE_DIR_PATH
 import os
 import azapi
 

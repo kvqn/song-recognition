@@ -1,5 +1,5 @@
-from app import DATABASE_PATH
-from app.db import list_songs
+from scraper import DATABASE_PATH
+from scraper.db import list_songs
 
 
 def list_main(args):

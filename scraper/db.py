@@ -1,4 +1,4 @@
-from app import DATABASE_PATH
+from scraper import DATABASE_PATH
 import json
 import uuid
 import threading

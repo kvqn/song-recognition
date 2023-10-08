@@ -1,7 +1,7 @@
 import datetime
-from app.util import strfdelta, ask_question
-from app.yt import get_songs_in_playlist
-from app.threads import ThreadManager
+from scraper.util import strfdelta, ask_question
+from scraper.yt import get_songs_in_playlist
+from scraper.threads import ThreadManager
 
 
 def add_playlist_main(args):
