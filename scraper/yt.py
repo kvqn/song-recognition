@@ -60,7 +60,7 @@ def download_song(url, output_func = print) -> DownloadedSong | None:
 
     output_func("Downloading lyrics...")
 
-    az = azapi.AZlyrics("google", accuracy=0.5)
+    az = azapi.AZlyrics("google", accuracy=0.8)
     az.title = title
     az.getLyrics()
     title = az.title
