@@ -60,13 +60,17 @@ def download_song(url, output_func = print) -> DownloadedSong | None:
 
     output_func("Downloading lyrics...")
 
-    az = azapi.AZlyrics("google", accuracy=0.8)
+    az = azapi.AZlyrics("google", accuracy=0.5)
     az.title = title
     az.getLyrics()
     title = az.title
     artist = az.artist
 
     lyrics_path = os.path.join(cache_dir, "lyrics.txt")
+    if len(az.lyrics.strip()) == 0:
+        output_func("No lyrics found. Skipping")
+        return None
+
     with open(lyrics_path, "w") as f:
         f.write(az.lyrics)
 
