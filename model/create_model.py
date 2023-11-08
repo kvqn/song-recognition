@@ -44,14 +44,39 @@ def get_text_embedding(text) -> np.ndarray:
     return _text_embedding_model(text).get()[0]
 
 
+def combine_embeddings(text_embedding, audio_embedding):
+    ret = np.concatenate((text_embedding, audio_embedding)).reshape(1, -1)
+    ret = np.expand_dims(ret, axis=2)
+    return ret
+
+
 def create_model(args):
     df = pd.read_csv(os.path.join(DATASET_DIR_PATH, "dataset.csv"))
     print(df)
 
+    n_songs = len(df)
+
+    model = keras.Sequential()
+    # model.add(keras.layers.Input(shape=(1, 5 * 128 + 384)))
+    model.add(keras.layers.InputLayer(input_shape=(5 * 128 + 384, 1)))
+    model.add(keras.layers.Conv1D(16, 4, strides=4, use_bias=True, activation="relu"))
+    model.add(keras.layers.MaxPooling1D(8, 4))
+    model.add(keras.layers.Flatten())
+    model.add(keras.layers.Dense(1000, activation="relu"))
+    model.add(keras.layers.Dense(100, activation="relu"))
+    # model.add(keras.layers.MaxPool1D(2))
+    model.add(keras.layers.Dense(n_songs, activation="softmax"))
+
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+
+    model.summary()
+
     X = []
     Y = []
-
-    n_songs = len(df)
 
     for _, song in df.iterrows():
         song_clips_dir = os.path.join(
@@ -76,9 +101,7 @@ def create_model(args):
         x = []
         for text_emb in lyrics_segments_embeddings:
             for song_emb in song_clips_embeddings:
-                _x = np.concatenate((text_emb, song_emb)).reshape(1, -1)
-                _x = np.expand_dims(_x, axis=2)
-                x.append(_x)
+                x.append(combine_embeddings(text_emb, song_emb))
 
         _y = np.zeros((1, n_songs))
         _y[0, song["index"]] = 1
@@ -89,10 +112,10 @@ def create_model(args):
     # X is just text embedding then audio embedding
     # Y is just a zero array with one 1 at the index of the song
 
-    print(len(X))
-    print(len(Y))
-    print(X[0].shape)
-    print(Y[0].shape)
+    # print(len(X))
+    # print(len(Y))
+    # print(X[0].shape)
+    # print(Y[0].shape)
 
     # X = np.expand_dims(X, axis=2)
 
@@ -124,9 +147,7 @@ def create_model(args):
         x = []
         for text_emb in lyrics_segments_embeddings:
             for song_emb in song_clips_embeddings:
-                _x = np.concatenate((text_emb, song_emb)).reshape(1, -1)
-                _x = np.expand_dims(_x, axis=2)
-                x.append(_x)
+                x.append(combine_embeddings(text_emb, song_emb))
 
         _y = np.zeros((1, n_songs))
         _y[0, song["index"]] = 1
@@ -137,27 +158,6 @@ def create_model(args):
 
     Z_val = tf.data.Dataset.from_tensor_slices((X_val, Y_val))
 
-    model = keras.Sequential()
-    # model.add(keras.layers.Input(shape=(1, 5 * 128 + 384)))
-    model.add(
-        keras.layers.Conv1D(
-            8, 4, use_bias=True, activation="relu", input_shape=(5 * 128 + 384, 1)
-        )
-    )
-    model.add(
-        keras.layers.Flatten(),
-    )
-    # model.add(keras.layers.MaxPool1D(2))
-    model.add(keras.layers.Dense(n_songs, activation="softmax"))
-
-    model.compile(
-        optimizer="adam",
-        loss="categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-
-    model.summary()
-
-    model.fit(Z, epochs=10, validation_data=Z_val)
+    model.fit(Z, epochs=30, validation_data=Z_val)
 
     model.save("model.keras")
