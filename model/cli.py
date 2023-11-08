@@ -8,6 +8,10 @@ command_create_dataset = command.add_parser(
     "create-dataset", help="Create a dataset from the songs in the database"
 )
 
+command_create_model = command.add_parser(
+    "create-model", help="Create a model from the dataset"
+)
+
 
 def main():
     args = parser.parse_args()
@@ -15,3 +19,8 @@ def main():
         from model.create_dataset import create_dataset
 
         create_dataset(args)
+
+    elif args.command == "create-model":
+        from model.create_model import create_model
+
+        create_model(args)

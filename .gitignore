@@ -9,3 +9,6 @@ database
 cache
 db.json
 /test
+
+audio_embedding.pkl
+model.keras

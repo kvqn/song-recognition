@@ -9,8 +9,10 @@ import shutil
 
 
 def _process_song(song: Song):
-    audio_output_dir = os.path.join(DATASET_DIR_PATH, "audio", str(song.index))
-    os.makedirs(audio_output_dir, exist_ok=True)
+    audio_train_output_dir = os.path.join(
+        DATASET_DIR_PATH, "audio_train", str(song.index)
+    )
+    os.makedirs(audio_train_output_dir, exist_ok=True)
     for clip_index, start in enumerate(range(0, int(song.duration) - 5, 5)):
         # Get song segment
         subprocess.run(
@@ -24,7 +26,27 @@ def _process_song(song: Song):
                 "0",
                 "-i",
                 song.song_path,
-                os.path.join(audio_output_dir, f"{clip_index}.wav"),
+                os.path.join(audio_train_output_dir, f"{clip_index}.wav"),
+            ]
+        )
+
+    audio_test_output_dir = os.path.join(
+        DATASET_DIR_PATH, "audio_test", str(song.index)
+    )
+    os.makedirs(audio_test_output_dir, exist_ok=True)
+    for clip_index, start in enumerate(range(0, int(song.duration) - 10, 5)):
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-ss",
+                str(start + 2.5),
+                "-t",
+                "5",
+                "-v",
+                "0",
+                "-i",
+                song.song_path,
+                os.path.join(audio_test_output_dir, f"{clip_index}.wav"),
             ]
         )
 
@@ -39,7 +61,7 @@ def create_dataset(args):
     if os.path.exists(DATASET_DIR_PATH):
         resp = input("Dataset already exists. Delete and continue? [y/N] ").lower()
         if resp in ["y", "yes"]:
-            subprocess.run(["rm", "-rf", DATASET_DIR_PATH])
+            shutil.rmtree(DATASET_DIR_PATH)
         else:
             return
 
