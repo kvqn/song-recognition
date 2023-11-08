@@ -5,7 +5,7 @@ import subprocess
 load_dotenv()
 
 CACHE_DIR_PATH = "cache"
-DATASET_DIR_PATH = "dataset"
+DATASET_DIR_PATH = "database"
 DATABASE_PATH = os.path.join(DATASET_DIR_PATH, "db.json")
 
 if not os.path.exists(DATASET_DIR_PATH):

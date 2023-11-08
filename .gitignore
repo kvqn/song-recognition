@@ -5,6 +5,7 @@ commit-message
 db.sqlite3
 testing
 dataset
+database
 cache
 db.json
 /test
