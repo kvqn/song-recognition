@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import pickle
+from pyAudioAnalysis import audioBasicIO, ShortTermFeatures
 
 _audio_embedding_model = torch.hub.load("harritaylor/torchvggish", "vggish")
 _audio_embedding_model.eval()
@@ -16,19 +17,27 @@ try:
 except FileNotFoundError:
     _audio_embedding_saved = {}
 
+try:
+    with open("song_embeddings.pkl", "rb`") as f:
+        _song_embeddings_saved = pickle.load(f)
+except FileNotFoundError:
+    _song_embeddings_saved = {}
+
 
 def get_audio_embedding(audio_path) -> np.ndarray:
     if audio_path in _audio_embedding_saved:
         return _audio_embedding_saved[audio_path]
 
-    ret = (
-        _audio_embedding_model.forward(audio_path)
-        .reshape(1, -1)
-        .detach()
-        .apply_(lambda x: x / 256)
+    sampling_rate, signal = audioBasicIO.read_audio_file(audio_path)
+    signal = audioBasicIO.stereo_to_mono(signal)
+
+    short_term_features, _ = ShortTermFeatures.feature_extraction(
+        signal, sampling_rate, 0.050 * sampling_rate, 0.025 * sampling_rate
     )
-    ret = ret.detach().numpy()
+
+    ret = short_term_features.reshape(1, -1)
     ret = ret[0]
+
     _audio_embedding_saved[audio_path] = ret
     with open("audio_embedding.pkl", "wb") as f:
         pickle.dump(_audio_embedding_saved, f)
@@ -58,9 +67,9 @@ def create_model(args):
 
     model = keras.Sequential()
     # model.add(keras.layers.Input(shape=(1, 5 * 128 + 384)))
-    model.add(keras.layers.InputLayer(input_shape=(5 * 128 + 384, 1)))
-    model.add(keras.layers.Conv1D(16, 4, strides=4, use_bias=True, activation="relu"))
-    model.add(keras.layers.MaxPooling1D(8, 4))
+    model.add(keras.layers.InputLayer(input_shape=(13916, 1)))
+    # model.add(keras.layers.Conv1D(16, 4, strides=4, use_bias=True, activation="relu"))
+    # model.add(keras.layers.MaxPooling1D(8, 4))
     model.add(keras.layers.Flatten())
     model.add(keras.layers.Dense(1000, activation="relu"))
     model.add(keras.layers.Dense(100, activation="relu"))
@@ -79,6 +88,10 @@ def create_model(args):
     Y = []
 
     for _, song in df.iterrows():
+        if song["index"] in _song_embeddings_saved:
+            X.append(_song_embeddings_saved[song["index"]]["x"])
+            Y.append(_song_embeddings_saved[song["index"]]["y"])
+            continue
         song_clips_dir = os.path.join(
             DATASET_DIR_PATH, "audio_train", str(song["index"])
         )
@@ -99,13 +112,23 @@ def create_model(args):
         ]
 
         x = []
+        # for text_emb in lyrics_segments_embeddings:
+        #     for song_emb in song_clips_embeddings:
+        #         x.append(combine_embeddings(text_emb, song_emb))
+
         for text_emb in lyrics_segments_embeddings:
-            for song_emb in song_clips_embeddings:
-                x.append(combine_embeddings(text_emb, song_emb))
+            x.append(combine_embeddings(text_emb, np.zeros((13532,))))
+
+        for song_emb in song_clips_embeddings:
+            x.append(combine_embeddings(np.zeros((384,)), song_emb))
 
         _y = np.zeros((1, n_songs))
         _y[0, song["index"]] = 1
         y = [_y] * len(x)
+
+        _song_embeddings_saved[song["index"]] = {"x": x, "y": y}
+        with open("song_embeddings.pkl", "wb") as f:
+            pickle.dump(_song_embeddings_saved, f)
 
         Y.extend(y)
         X.extend(x)
