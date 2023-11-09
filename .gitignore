@@ -10,5 +10,5 @@ cache
 db.json
 /test
 
-audio_embedding.pkl
+*.pkl
 model.keras

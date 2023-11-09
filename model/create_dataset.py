@@ -13,7 +13,7 @@ def _process_song(song: Song):
         DATASET_DIR_PATH, "audio_train", str(song.index)
     )
     os.makedirs(audio_train_output_dir, exist_ok=True)
-    for clip_index, start in enumerate(range(0, int(song.duration) - 5, 5)):
+    for clip_index, start in enumerate(range(0, int(song.duration) - 5, 1)):
         # Get song segment
         subprocess.run(
             [
