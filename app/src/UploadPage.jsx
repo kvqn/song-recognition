@@ -7,6 +7,7 @@ const UploadPage = () => {
   const [response, setResponse] = useState(null);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const loadingMessages = [
     "Uploading audio...",
@@ -35,18 +36,30 @@ const UploadPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!audioFile && !text) {
+      setError("Please upload an audio file or enter text");
+      return
+    }
+
+    setError(null)
+
     setIsSubmitting(true);
     cycleLoadingMessages();
 
     const formData = new FormData();
     console.log(audioFile)
-    formData.append("audio", audioFile);
-    formData.append("text", text);
-    console.log(formData)
+    if (audioFile) formData.append("audio", audioFile);
+    if (text) formData.append("text", text);
+
+    let url
+    if (audioFile && text) url = "http://localhost:8000/predict/audio-and-text"
+    if (audioFile && !text) url = "http://localhost:8000/predict/audio"
+    if (!audioFile && text) url = "http://localhost:8000/predict/text"
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/predict",
+        url,
         formData,
         {
           headers: {
@@ -113,6 +126,14 @@ const UploadPage = () => {
             <p className="text-sm">Song: {response.song}</p>
             <p className="text-sm">Artist: {response.artist}</p>
             <p className="text-sm">Confidence: {response.confidence*100} %</p>
+          </div>
+        </div>
+      )}
+      {error && (
+        <div className="mx-auto mt-8 max-w-md">
+          <div className="rounded-b border-t-4 border-red-500 bg-red-100 px-4 py-3 text-red-900 shadow-md">
+            <div className="mb-4 text-center text-xl font-bold">Error</div>
+            <p className="text-sm">{error}</p>
           </div>
         </div>
       )}

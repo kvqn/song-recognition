@@ -49,6 +49,10 @@ def get_audio_embedding(audio_path) -> np.ndarray:
     return ret
 
 
+def get_empty_audio_embedding():
+    return np.zeros((13532,))
+
+
 from towhee import AutoPipes
 
 _text_embedding_model = AutoPipes.pipeline("sentence_embedding")
@@ -56,6 +60,10 @@ _text_embedding_model = AutoPipes.pipeline("sentence_embedding")
 
 def get_text_embedding(text) -> np.ndarray:
     return _text_embedding_model(text).get()[0]
+
+
+def get_empty_text_embedding():
+    return np.zeros((384,))
 
 
 def combine_embeddings(text_embedding, audio_embedding):
@@ -122,10 +130,10 @@ def create_model(args):
         #         x.append(combine_embeddings(text_emb, song_emb))
 
         for text_emb in lyrics_segments_embeddings:
-            x.append(combine_embeddings(text_emb, np.zeros((13532,))))
+            x.append(combine_embeddings(text_emb, get_empty_audio_embedding()))
 
         for song_emb in song_clips_embeddings:
-            x.append(combine_embeddings(np.zeros((384,)), song_emb))
+            x.append(combine_embeddings(get_empty_text_embedding(), song_emb))
 
         _y = np.zeros((1, n_songs))
         _y[0, song["index"]] = 1
