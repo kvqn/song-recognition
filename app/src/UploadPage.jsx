@@ -1,13 +1,13 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState } from "react"
+import axios from "axios"
 
 const UploadPage = () => {
-  const [audioFile, setAudioFile] = useState(null);
-  const [text, setText] = useState("");
-  const [response, setResponse] = useState(null);
-  const [loadingMessage, setLoadingMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [audioFile, setAudioFile] = useState(null)
+  const [text, setText] = useState("")
+  const [response, setResponse] = useState(null)
+  const [loadingMessage, setLoadingMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   const loadingMessages = [
     "Uploading audio...",
@@ -16,41 +16,41 @@ const UploadPage = () => {
     "Requesting server...",
     "Getting response...",
     "Hang in for a moment...",
-  ];
+  ]
 
   const handleAudioChange = (event) => {
-    setAudioFile(event.target.files[0]);
-  };
+    setAudioFile(event.target.files[0])
+  }
 
   const handleTextChange = (event) => {
-    setText(event.target.value);
-  };
+    setText(event.target.value)
+  }
 
   const cycleLoadingMessages = (index = 0) => {
-    setLoadingMessage(loadingMessages[index]);
-    index = (index + 1) % loadingMessages.length;
+    setLoadingMessage(loadingMessages[index])
+    index = (index + 1) % loadingMessages.length
 
-    const timer = setTimeout(() => cycleLoadingMessages(index), 1000);
-    return () => clearTimeout(timer);
-  };
+    const timer = setTimeout(() => cycleLoadingMessages(index), 1000)
+    return () => clearTimeout(timer)
+  }
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (!audioFile && !text) {
-      setError("Please upload an audio file or enter text");
+      setError("Please upload an audio file or enter text")
       return
     }
 
     setError(null)
 
-    setIsSubmitting(true);
-    cycleLoadingMessages();
+    setIsSubmitting(true)
+    cycleLoadingMessages()
 
-    const formData = new FormData();
+    const formData = new FormData()
     console.log(audioFile)
-    if (audioFile) formData.append("audio", audioFile);
-    if (text) formData.append("text", text);
+    if (audioFile) formData.append("audio", audioFile)
+    if (text) formData.append("text", text)
 
     let url
     if (audioFile && text) url = "http://localhost:8000/predict/audio-and-text"
@@ -58,23 +58,19 @@ const UploadPage = () => {
     if (!audioFile && text) url = "http://localhost:8000/predict/text"
 
     try {
-      const res = await axios.post(
-        url,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const res = await axios.post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      );
-      setResponse(res.data);
+      })
+      setResponse(res.data)
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error uploading file:", error)
     } finally {
-      setIsSubmitting(false);
-      setLoadingMessage("");
+      setIsSubmitting(false)
+      setLoadingMessage("")
     }
-  };
+  }
 
   return (
     <div className="container mx-auto p-8">
@@ -125,7 +121,7 @@ const UploadPage = () => {
             <div className="mb-4 text-center text-xl font-bold">Response</div>
             <p className="text-sm">Song: {response.song}</p>
             <p className="text-sm">Artist: {response.artist}</p>
-            <p className="text-sm">Confidence: {response.confidence*100} %</p>
+            <p className="text-sm">Confidence: {response.confidence * 100} %</p>
           </div>
         </div>
       )}
@@ -138,7 +134,7 @@ const UploadPage = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default UploadPage;
+export default UploadPage

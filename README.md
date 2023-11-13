@@ -13,5 +13,3 @@ So I wrote a script to scrape it.
 Use the CLI. It's pretty straight forward.
 
 `py -m scraper`
-
-

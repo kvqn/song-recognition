@@ -14,3 +14,5 @@ db.json
 model.keras
 
 .saved
+
+node_modules
