@@ -18,6 +18,13 @@ command_predict = command.add_parser(
 command_predict.add_argument("audio", type=str, help="Path to the audio file")
 command_predict.add_argument("lyrics", type=str, help="Part of the lyrics")
 
+command_start_server = command.add_parser(
+    "start-server", help="Start the server for the model"
+)
+command_start_server.add_argument(
+    "--reload", action="store_true", help="Hot reload server on changes"
+)
+
 
 def main():
     args = parser.parse_args()
@@ -34,3 +41,7 @@ def main():
         from model.predict import predict
 
         predict(args)
+    elif args.command == "start-server":
+        from model.server import start_server
+
+        start_server(args)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 const UploadPage = () => {
@@ -39,12 +39,14 @@ const UploadPage = () => {
     cycleLoadingMessages();
 
     const formData = new FormData();
+    console.log(audioFile)
     formData.append("audio", audioFile);
     formData.append("text", text);
+    console.log(formData)
 
     try {
       const res = await axios.post(
-        "http://localhost:6969/api/upload",
+        "http://localhost:8000/predict",
         formData,
         {
           headers: {
@@ -110,7 +112,7 @@ const UploadPage = () => {
             <div className="mb-4 text-center text-xl font-bold">Response</div>
             <p className="text-sm">Song: {response.song}</p>
             <p className="text-sm">Artist: {response.artist}</p>
-            <p className="text-sm">Confidence: {response.confidence}</p>
+            <p className="text-sm">Confidence: {response.confidence*100} %</p>
           </div>
         </div>
       )}

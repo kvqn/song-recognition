@@ -12,3 +12,5 @@ db.json
 
 *.pkl
 model.keras
+
+.saved
