@@ -43,4 +43,10 @@ def predict_from_embedding(audio_embedding, text_embedding):
     thumbnail_url = songs.iloc[song_index]["thumbnail_url"]
     youtube_url = songs.iloc[song_index]["youtube_url"]
 
-    return Prediction(song=song, artist=artist, confidence=confidence)
+    return Prediction(
+        song=song,
+        artist=artist,
+        confidence=confidence,
+        thumbnail_url=thumbnail_url,
+        youtube_url=youtube_url,
+    )
