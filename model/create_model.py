@@ -44,8 +44,6 @@ def get_audio_embedding(audio_path) -> np.ndarray:
     ret = ret[0]
 
     _audio_embedding_saved[audio_path] = ret
-    with open("audio_embedding.pkl", "wb") as f:
-        pickle.dump(_audio_embedding_saved, f)
     return ret
 
 
@@ -101,6 +99,7 @@ def create_model(args):
     Y = []
 
     for _, song in df.iterrows():
+        print(f"Processing song {song['index']}")
         if song["index"] in _song_train_embeddings:
             X.extend(_song_train_embeddings[song["index"]]["x"])
             Y.extend(_song_train_embeddings[song["index"]]["y"])
@@ -140,11 +139,15 @@ def create_model(args):
         y = [_y] * len(x)
 
         _song_train_embeddings[song["index"]] = {"x": x, "y": y}
-        with open("song_train_embeddings.pkl", "wb") as f:
-            pickle.dump(_song_train_embeddings, f)
 
         Y.extend(y)
         X.extend(x)
+
+    with open("song_train_embeddings.pkl", "wb") as f:
+        pickle.dump(_song_train_embeddings, f)
+
+    with open("audio_embedding.pkl", "wb") as f:
+        pickle.dump(_audio_embedding_saved, f)
     # X is just text embedding then audio embedding
     # Y is just a zero array with one 1 at the index of the song
 

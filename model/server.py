@@ -85,6 +85,8 @@ async def predict_text(
         "song": prediction["song"],
         "artist": prediction["artist"],
         "confidence": float(prediction["confidence"]),
+        "thumnail_url": prediction["thumbnail_url"],
+        "youtube_url": prediction["youtube_url"],
     }
 
 

@@ -18,7 +18,7 @@ class DownloadedSong:
         self.lyrics_path = lyrics_path
 
 
-def download_song(url, output_func = print) -> DownloadedSong | None:
+def download_song(url, output_func=print) -> DownloadedSong | None:
     """
     Download a song from YouTube
     """
@@ -60,7 +60,7 @@ def download_song(url, output_func = print) -> DownloadedSong | None:
 
     output_func("Downloading lyrics...")
 
-    az = azapi.AZlyrics("google", accuracy=0.5)
+    az = azapi.AZlyrics("google", accuracy=0.3)
     az.title = title
     az.getLyrics()
     title = az.title

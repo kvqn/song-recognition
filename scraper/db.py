@@ -61,6 +61,7 @@ def list_songs():
 import os
 import subprocess
 import shlex
+import json
 
 
 class Song:
@@ -89,6 +90,11 @@ class Song:
         self.duration = float(proc.stdout)
 
         self.index: int
+
+        with open(self.info_json) as f:
+            info_json = json.load(f)
+        self.thumbnail_url = info_json["thumbnail"]
+        self.youtube_url = info_json["webpage_url"]
 
 
 def get_songs() -> list[Song]:

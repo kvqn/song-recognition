@@ -26,6 +26,8 @@ class Prediction(TypedDict):
     song: str
     artist: str
     confidence: float
+    thumbnail_url: str
+    youtube_url: str
 
 
 def predict_from_embedding(audio_embedding, text_embedding):
@@ -37,6 +39,8 @@ def predict_from_embedding(audio_embedding, text_embedding):
 
     songs = pd.read_csv(os.path.join(DATASET_DIR_PATH, "dataset.csv"))
     song = songs.iloc[song_index]["title"]
-    artst = songs.iloc[song_index]["artist"]
+    artist = songs.iloc[song_index]["artist"]
+    thumbnail_url = songs.iloc[song_index]["thumbnail_url"]
+    youtube_url = songs.iloc[song_index]["youtube_url"]
 
-    return Prediction(song=song, artist=artst, confidence=confidence)
+    return Prediction(song=song, artist=artist, confidence=confidence)

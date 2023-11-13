@@ -23,6 +23,9 @@ _add_song.add_argument("url", help="URL of the playlist or song", type=str)
 _add_playlist = _add_subparsers.add_parser("playlist", help="Add a playlist")
 _add_playlist.add_argument("url", help="URL of the playlist or song", type=str)
 
+_remove = _subparsers.add_parser("remove", help="Remove a song")
+_remove.add_argument("id", help="ID of the song to remove", type=str)
+
 from .add_song import add_song_main
 from .add_playlist import add_playlist_main
 from .list import list_main
@@ -40,5 +43,9 @@ def main():
         add_song_main(args)
     elif args.command == "add" and args.add_command == "playlist":
         add_playlist_main(args)
+    elif args.command == "remove":
+        from .remove import remove
+
+        remove(args)
     else:
         print("Unknown command")

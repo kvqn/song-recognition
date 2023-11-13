@@ -41,9 +41,11 @@ class Thread(threading.Thread):
             os.path.basename(dl.lyrics_path),
         )
 
-        move_file(os.path.join(CACHE_DIR_PATH, dl.id), os.path.join(DATASET_DIR_PATH, id))
+        move_file(
+            os.path.join(CACHE_DIR_PATH, dl.id), os.path.join(DATASET_DIR_PATH, id)
+        )
 
-        print(f"[{song.index}/{self.manager.n_songs}] - {dl.title}")
+        print(f"[{song.index}/{self.manager.n_songs}] - {dl.title} ({dl.artist})")
 
 
 class ThreadManager:
@@ -80,4 +82,3 @@ class ThreadManager:
 
         for thread in self.threads:
             thread.join()
-
