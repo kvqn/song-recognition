@@ -157,51 +157,52 @@ def create_model(args):
 
     Z = tf.data.Dataset.from_tensor_slices((X, Y))
 
-    X_val = []
-    Y_val = []
+    # X_val = []
+    # Y_val = []
 
-    for _, song in df.iterrows():
-        if song["index"] in _song_test_embeddings:
-            X_val.extend(_song_test_embeddings[song["index"]]["x"])
-            Y_val.extend(_song_test_embeddings[song["index"]]["y"])
-            continue
-        song_clips_dir = os.path.join(
-            DATASET_DIR_PATH, "audio_test", str(song["index"])
-        )
-        song_clips = os.listdir(song_clips_dir)
-        song_clips = [os.path.join(song_clips_dir, clip) for clip in song_clips]
-        song_clips_embeddings = [get_audio_embedding(clip) for clip in song_clips]
+    # for _, song in df.iterrows():
+    #     if song["index"] in _song_test_embeddings:
+    #         X_val.extend(_song_test_embeddings[song["index"]]["x"])
+    #         Y_val.extend(_song_test_embeddings[song["index"]]["y"])
+    #         continue
+    #     song_clips_dir = os.path.join(
+    #         DATASET_DIR_PATH, "audio_test", str(song["index"])
+    #     )
+    #     song_clips = os.listdir(song_clips_dir)
+    #     song_clips = [os.path.join(song_clips_dir, clip) for clip in song_clips]
+    #     song_clips_embeddings = [get_audio_embedding(clip) for clip in song_clips]
 
-        lyrics_path = os.path.join(DATASET_DIR_PATH, "lyrics", f"{song['index']}.txt")
-        with open(lyrics_path) as f:
-            lyrics = f.read()
-        words = lyrics.split()
-        lyrics_segments = [
-            " ".join(words[i : i + 10]) for i in range(5, len(words), 10)
-        ]
-        # print(lyrics_segments)
-        lyrics_segments_embeddings = [
-            get_text_embedding(text) for text in lyrics_segments
-        ]
+    #     lyrics_path = os.path.join(DATASET_DIR_PATH, "lyrics", f"{song['index']}.txt")
+    #     with open(lyrics_path) as f:
+    #         lyrics = f.read()
+    #     words = lyrics.split()
+    #     lyrics_segments = [
+    #         " ".join(words[i : i + 10]) for i in range(5, len(words), 10)
+    #     ]
+    #     # print(lyrics_segments)
+    #     lyrics_segments_embeddings = [
+    #         get_text_embedding(text) for text in lyrics_segments
+    #     ]
 
-        x = []
-        for text_emb in lyrics_segments_embeddings:
-            for song_emb in song_clips_embeddings:
-                x.append(combine_embeddings(text_emb, song_emb))
+    #     x = []
+    #     for text_emb in lyrics_segments_embeddings:
+    #         for song_emb in song_clips_embeddings:
+    #             x.append(combine_embeddings(text_emb, song_emb))
 
-        _y = np.zeros((1, n_songs))
-        _y[0, song["index"]] = 1
-        y = [_y] * len(x)
+    #     _y = np.zeros((1, n_songs))
+    #     _y[0, song["index"]] = 1
+    #     y = [_y] * len(x)
 
-        _song_test_embeddings[song["index"]] = {"x": x, "y": y}
-        with open("song_test_embeddings.pkl", "wb") as f:
-            pickle.dump(_song_test_embeddings, f)
+    #     _song_test_embeddings[song["index"]] = {"x": x, "y": y}
+    #     with open("song_test_embeddings.pkl", "wb") as f:
+    #         pickle.dump(_song_test_embeddings, f)
 
-        Y_val.extend(y)
-        X_val.extend(x)
+    #     Y_val.extend(y)
+    #     X_val.extend(x)
 
-    Z_val = tf.data.Dataset.from_tensor_slices((X_val, Y_val))
+    # Z_val = tf.data.Dataset.from_tensor_slices((X_val, Y_val))
 
-    model.fit(Z, epochs=50, validation_data=Z_val)
+    # model.fit(Z, epochs=50, validation_data=Z_val)
+    model.fit(Z, epochs=50)
 
     model.save("model.keras")
