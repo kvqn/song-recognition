@@ -8,7 +8,7 @@ export default function SongArchive() {
 
   useEffect(() => {
     async function _() {
-      const resp = await axios.get("http://localhost:8000/songs")
+      const resp = await axios.get("http://100.101.242.147:8000/songs")
       setSongs(resp.data.songs)
     }
     _()
