@@ -76,19 +76,27 @@ def create_model(args):
 
     n_songs = len(df)
 
-    model = keras.Sequential()
-    # model.add(keras.layers.Input(shape=(1, 5 * 128 + 384)))
-    model.add(keras.layers.InputLayer(input_shape=(13916, 1)))
-    # model.add(keras.layers.Activation("sigmoid"))
-    # model.add(keras.layers.Conv1D(16, 4, use_bias=True, activation="relu"))
-    # model.add(keras.layers.MaxPooling1D(8, 4))
-    model.add(keras.layers.Flatten())
-    # model.add(keras.layers.Dense(200, activation="relu"))
-    # model.add(keras.layers.MaxPool1D(2))
-    model.add(keras.layers.Dense(n_songs, activation="softmax"))
+    # model = keras.Sequential()
+    # # model.add(keras.layers.Input(shape=(1, 5 * 128 + 384)))
+    # model.add(keras.layers.InputLayer(input_shape=(13916, 1)))
+    # # model.add(keras.layers.Activation("sigmoid"))
+    # # model.add(keras.layers.Conv1D(16, 4, use_bias=True, activation="relu"))
+    # # model.add(keras.layers.MaxPooling1D(8, 4))
+    # model.add(keras.layers.Flatten())
+    # # model.add(keras.layers.Dense(500, activation="relu"))
+    # # model.add(keras.layers.MaxPool1D(2))
+    # model.add(keras.layers.Dense(n_songs, activation="softmax"))
+
+    # model.compile(
+    #     optimizer=keras.optimizers.Adam(learning_rate=0.0001),
+    #     loss="categorical_crossentropy",
+    #     metrics=["accuracy"],
+    # )
+
+    model = keras.models.load_model("model.keras")
 
     model.compile(
-        optimizer="adam",
+        optimizer=keras.optimizers.Adam(learning_rate=0.0001),
         loss="categorical_crossentropy",
         metrics=["accuracy"],
     )
@@ -143,11 +151,11 @@ def create_model(args):
         Y.extend(y)
         X.extend(x)
 
-    with open("song_train_embeddings.pkl", "wb") as f:
-        pickle.dump(_song_train_embeddings, f)
+        with open("song_train_embeddings.pkl", "wb") as f:
+            pickle.dump(_song_train_embeddings, f)
 
-    with open("audio_embedding.pkl", "wb") as f:
-        pickle.dump(_audio_embedding_saved, f)
+        with open("audio_embedding.pkl", "wb") as f:
+            pickle.dump(_audio_embedding_saved, f)
     # X is just text embedding then audio embedding
     # Y is just a zero array with one 1 at the index of the song
 

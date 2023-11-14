@@ -13,12 +13,15 @@ import aiofiles
 import uuid
 import os
 import shutil
+import pandas as pd
+from model import DATASET_DIR_PATH
 
 
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",
+    # "http://localhost:5173",
+    "*",
     # "https://localhost.tiangolo.com",
     # "http://localhost",
     # "http://localhost:8080",
@@ -54,6 +57,8 @@ async def predict_audio_and_text(
         "song": prediction["song"],
         "artist": prediction["artist"],
         "confidence": float(prediction["confidence"]),
+        "thumbnail_url": prediction["thumbnail_url"],
+        "youtube_url": prediction["youtube_url"],
     }
 
 
@@ -71,6 +76,8 @@ async def predict_audio(
         "song": prediction["song"],
         "artist": prediction["artist"],
         "confidence": float(prediction["confidence"]),
+        "thumbnail_url": prediction["thumbnail_url"],
+        "youtube_url": prediction["youtube_url"],
     }
 
 
@@ -85,9 +92,26 @@ async def predict_text(
         "song": prediction["song"],
         "artist": prediction["artist"],
         "confidence": float(prediction["confidence"]),
-        "thumnail_url": prediction["thumbnail_url"],
+        "thumbnail_url": prediction["thumbnail_url"],
         "youtube_url": prediction["youtube_url"],
     }
+
+
+@app.get("/songs")
+async def songs():
+    df = pd.read_csv(os.path.join(DATASET_DIR_PATH, "dataset.csv"))
+    songs = []
+    for _, song in df.iterrows():
+        songs.append(
+            {
+                "song": song["title"],
+                "artist": song["artist"],
+                "thumbnail_url": song["thumbnail_url"],
+                "youtube_url": song["youtube_url"],
+            }
+        )
+
+    return {"songs": songs}
 
 
 def start_server(args):
@@ -96,4 +120,4 @@ def start_server(args):
 
     import uvicorn
 
-    uvicorn.run("model.server:app", reload=args.reload)
+    uvicorn.run("model.server:app", reload=args.reload, host="0.0.0.0")
