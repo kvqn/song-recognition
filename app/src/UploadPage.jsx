@@ -53,9 +53,10 @@ const UploadPage = () => {
     if (text) formData.append("text", text)
 
     let url
-    if (audioFile && text) url = "http://localhost:8000/predict/audio-and-text"
-    if (audioFile && !text) url = "http://localhost:8000/predict/audio"
-    if (!audioFile && text) url = "http://localhost:8000/predict/text"
+    if (audioFile && text)
+      url = "http://100.101.242.147:8000/predict/audio-and-text"
+    if (audioFile && !text) url = "http://100.101.242.147:8000/predict/audio"
+    if (!audioFile && text) url = "http://100.101.242.147:8000/predict/text"
 
     try {
       const res = await axios.post(url, formData, {
@@ -73,8 +74,11 @@ const UploadPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="mx-auto max-w-md overflow-hidden rounded-xl bg-white shadow-md md:max-w-2xl">
+    <div className="mx-auto flex w-full flex-col items-center justify-center pt-10">
+      <h1 className="mx-auto pb-10 pt-4 text-4xl font-semibold text-[#11111c]">
+        Multimodal song Recognition Platform
+      </h1>
+      <div className="mx-auto w-[full] overflow-hidden rounded-xl bg-white shadow-md">
         <div className="md:flex">
           <div className="p-8">
             <div className="mb-4 text-center text-xl font-bold">
@@ -116,12 +120,23 @@ const UploadPage = () => {
         </div>
       </div>
       {response && (
-        <div className="mx-auto mt-8 max-w-md">
-          <div className="rounded-b border-t-4 border-green-500 bg-green-100 px-4 py-3 text-green-900 shadow-md">
+        <div className="mx-auto mt-8 w-[40%]">
+          <div className="rounded-md rounded-b border-t-4 border-green-500 bg-green-100 px-4 py-3 text-green-900 shadow-md">
             <div className="mb-4 text-center text-xl font-bold">Response</div>
-            <p className="text-sm">Song: {response.song}</p>
-            <p className="text-sm">Artist: {response.artist}</p>
-            <p className="text-sm">Confidence: {response.confidence * 100} %</p>
+            <div className="flex justify-between gap-20 font-semibold">
+              <div>
+                <p className="py-2 text-sm">Song: {response.song}</p>
+                <p className="py-2 text-sm">Artist: {response.artist}</p>
+                <p className="py-2 text-sm">
+                  Confidence: {Math.round(response.confidence * 100)}%
+                </p>
+              </div>
+              <div>
+                <a href={response.youtube_url}>
+                  <img src={response.thumbnail_url} alt="" width={200} />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       )}
