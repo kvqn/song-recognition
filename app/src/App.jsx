@@ -2,7 +2,7 @@ import React from "react"
 import { BrowserRouter as Router } from "react-router-dom"
 
 import Routes from "./Routes" // Assuming you have a separate Routes component
-import NavBar from "./NavBar"
+import NavBar from "./NavBar.jsx"
 
 function App() {
   return (
