@@ -1,7 +1,7 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
 
-const Navbar = () => {
+const NavBar = () => {
   const navigate = useNavigate()
   const linkStyle =
     "px-4 py-2 text-base font-semibold text-gray-700 hover:text-blue-500 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105"
@@ -36,4 +36,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default NavBar
