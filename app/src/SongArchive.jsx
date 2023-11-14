@@ -8,7 +8,7 @@ export default function SongArchive() {
 
   useEffect(() => {
     async function _() {
-      const resp = await axios.get("http://localhost:8000/songs")
+      const resp = await axios.get("http://100.101.242.147:8000/songs")
       setSongs(resp.data.songs)
     }
     _()
@@ -33,6 +33,7 @@ export default function SongArchive() {
     }
   }, [filter, songs])
 
+  // console.log(filteredSongs)
   return (
     <div className="flex flex-row justify-center">
       <div className="flex w-1/2 flex-col justify-evenly gap-2">
@@ -40,7 +41,7 @@ export default function SongArchive() {
           type="text"
           className="mt-8 border-2 p-2"
           onChange={onFilterChange}
-          placeholder="Search"
+          placeholder="Search Songs"
         ></input>
         <div className="mb-8 flex flex-col items-center">
           <p>{filteredSongs.length} results</p>
@@ -48,14 +49,14 @@ export default function SongArchive() {
         {filteredSongs.map((song, i) => (
           <div
             key={i}
-            className="flex w-full flex-row items-center justify-between border-2 p-4 transition-all hover:border-black"
+            className="flex w-full flex-row items-center justify-between rounded-[0.5rem] border-2 bg-gray-50 p-4 transition-all hover:scale-[1.01] hover:border-black hover:bg-[#bac2c4]"
           >
             <div>
               <div className="font-bold">{song.song}</div>
               <div>{song.artist}</div>
             </div>
-            <a href={song.youtube_url}>
-              <img src={song.thumbnail_url} width={200}></img>
+            <a href={song.youtube_url} target="_blank">
+              <img src={song.thumbnail_url} width={200} height={150}></img>
             </a>
           </div>
         ))}

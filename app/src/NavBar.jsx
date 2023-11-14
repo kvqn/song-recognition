@@ -14,7 +14,7 @@ const NavBar = () => {
   }
 
   return (
-    <nav className="sticky top-0 bg-white pt-2 shadow-md">
+    <nav className="sticky top-0 z-50 bg-white pt-2 shadow-md">
       <div className="flex justify-center space-x-4">
         <div className={getLinkStyle("/app")} onClick={() => navigate("/app")}>
           App
