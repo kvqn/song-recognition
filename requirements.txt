@@ -22,3 +22,4 @@ towhee==1.1.2
 towhee.models==1.1.2
 sentence-transformers==2.2.2
 aiofiles==23.2.1
+mdformat==0.7.17
