@@ -1,5 +1,13 @@
 import { useState } from "react"
 import axios from "axios"
+import { useReactMediaRecorder } from "react-media-recorder"
+import { twMerge } from "tailwind-merge"
+// import { useAudioRecorder } from "react-audio-voice-recorder"
+import { useEffect } from "react"
+
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 const UploadPage = () => {
   const [audioFile, setAudioFile] = useState(null)
@@ -8,6 +16,22 @@ const UploadPage = () => {
   const [loadingMessage, setLoadingMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
+
+  const { status, startRecording, stopRecording, mediaBlobUrl } =
+    useReactMediaRecorder({ audio: true })
+
+  // const {
+  //   startRecording,
+  //   stopRecording,
+  //   // togglePauseResume,
+  //   recordingBlob,
+  //   isRecording,
+  //   isPaused,
+  //   recordingTime,
+  //   // mediaRecorder,
+  // } = useAudioRecorder()
+
+  const [onRecordTab, setOnRecordTab] = useState(false)
 
   const loadingMessages = [
     "Uploading audio...",
@@ -37,9 +61,24 @@ const UploadPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!audioFile && !text) {
-      setError("Please upload an audio file or enter text")
-      return
+    let file
+
+    if (!onRecordTab) {
+      if (!audioFile && !text) {
+        setError("Please upload an audio file or enter text")
+        return
+      }
+      file = audioFile
+    } else {
+      if (!mediaBlobUrl && !text) {
+        setError("Please record an audio file or enter text")
+        return
+      }
+      if (mediaBlobUrl) {
+        const resp = await fetch(mediaBlobUrl)
+        const recordingBlob = await resp.blob()
+        file = new File([recordingBlob], "audio.wav", { type: "audio/wav" })
+      }
     }
 
     setError(null)
@@ -48,15 +87,14 @@ const UploadPage = () => {
     cycleLoadingMessages()
 
     const formData = new FormData()
-    console.log(audioFile)
-    if (audioFile) formData.append("audio", audioFile)
+    console.log(file)
+    if (file) formData.append("audio", file)
     if (text) formData.append("text", text)
 
     let url
-    if (audioFile && text)
-      url = "http://100.101.242.147:8000/predict/audio-and-text"
-    if (audioFile && !text) url = "http://100.101.242.147:8000/predict/audio"
-    if (!audioFile && text) url = "http://100.101.242.147:8000/predict/text"
+    if (file && text) url = "http://100.101.242.147:8000/predict/audio-and-text"
+    if (file && !text) url = "http://100.101.242.147:8000/predict/audio"
+    if (!file && text) url = "http://100.101.242.147:8000/predict/text"
 
     try {
       const res = await axios.post(url, formData, {
@@ -78,21 +116,68 @@ const UploadPage = () => {
       <h1 className="mx-auto pb-10 pt-4 text-4xl font-semibold text-[#11111c]">
         Multimodal song Recognition Platform
       </h1>
-      <div className="mx-auto w-[full] overflow-hidden rounded-xl bg-white shadow-md">
-        <div className="md:flex">
+
+      <div className="w-1/2 overflow-hidden rounded-xl bg-white shadow-md">
+        <div className="">
+          <div className="flex h-12 justify-evenly border-b-2">
+            <div
+              className={twMerge(
+                "flex h-full w-full items-center justify-center border-r transition-all",
+                onRecordTab ? "hover:bg-blue-100" : "bg-blue-200",
+              )}
+              onClick={() => {
+                setOnRecordTab(false)
+              }}
+            >
+              Upload File
+            </div>
+            <div
+              className={twMerge(
+                "flex h-full w-full items-center justify-center border-r transition-all hover:bg-blue-100",
+                onRecordTab ? "bg-blue-200" : "hover:bg-blue-100",
+              )}
+              onClick={() => {
+                setOnRecordTab(true)
+              }}
+            >
+              Record Audio
+            </div>
+          </div>
           <div className="p-8">
             <div className="mb-4 text-center text-xl font-bold">
-              Upload Audio and Text
+              {onRecordTab ? "Record Audio and Text" : "Upload File and Text"}
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <input
-                  className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
-                  type="file"
-                  onChange={handleAudioChange}
-                  accept="audio/*"
-                />
-              </div>
+            <div>
+              {onRecordTab ? (
+                <div className="flex justify-center gap-4 p-4">
+                  <button
+                    onClick={async () => {
+                      startRecording()
+                      await sleep(5000)
+                      stopRecording()
+                    }}
+                    className={twMerge(
+                      "block rounded-3xl bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:outline-none",
+                      status === "recording" ? "bg-blue-500" : "",
+                    )}
+                    disabled={status === "recording"}
+                  >
+                    {status === "recording"
+                      ? "Recording.."
+                      : " Start Recording "}
+                  </button>
+                  <audio className="block" src={mediaBlobUrl} controls />
+                </div>
+              ) : (
+                <div className="mb-4">
+                  <input
+                    className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
+                    type="file"
+                    onChange={handleAudioChange}
+                    accept="audio/*"
+                  />
+                </div>
+              )}
               <div className="mb-6">
                 <textarea
                   className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
@@ -106,11 +191,12 @@ const UploadPage = () => {
                   className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
                   type="submit"
                   disabled={isSubmitting}
+                  onClick={handleSubmit}
                 >
                   {isSubmitting ? "Uploading..." : "Upload"}
                 </button>
               </div>
-            </form>
+            </div>
             {isSubmitting && (
               <div className="mt-4 text-center text-sm text-gray-500">
                 {loadingMessage}

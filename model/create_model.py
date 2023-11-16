@@ -6,6 +6,7 @@ from tensorflow import keras
 import numpy as np
 import pickle
 from pyAudioAnalysis import audioBasicIO, ShortTermFeatures
+import librosa
 
 # _audio_embedding_model = torch.hub.load("harritaylor/torchvggish", "vggish")
 # _audio_embedding_model.eval()
@@ -33,7 +34,8 @@ def get_audio_embedding(audio_path) -> np.ndarray:
     if audio_path in _audio_embedding_saved:
         return _audio_embedding_saved[audio_path]
 
-    sampling_rate, signal = audioBasicIO.read_audio_file(audio_path)
+    # sampling_rate, signal = audioBasicIO.read_audio_file(audio_path)
+    signal, sampling_rate = librosa.load(audio_path)
     signal = audioBasicIO.stereo_to_mono(signal)
 
     short_term_features, _ = ShortTermFeatures.feature_extraction(
@@ -42,6 +44,9 @@ def get_audio_embedding(audio_path) -> np.ndarray:
 
     ret = short_term_features.reshape(1, -1)
     ret = ret[0]
+
+    if len(ret) < 13532:
+        ret = np.pad(ret, (0, 13532 - len(ret)), "constant")
 
     _audio_embedding_saved[audio_path] = ret
     return ret

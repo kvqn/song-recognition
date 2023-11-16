@@ -47,6 +47,7 @@ async def predict_audio_and_text(
     audio: Annotated[UploadFile, Form()],
     text: Annotated[str, Form()],
 ):
+    # print(audio, text)
     save_path = os.path.join(".saved", f"{uuid.uuid4()}.wav")
     with open(save_path, "wb") as file:
         shutil.copyfileobj(audio.file, file)
